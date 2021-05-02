@@ -9,6 +9,7 @@ const styles = (theme) => ({
         color: "#f9f6f2",
         textAlign: "center",
         borderRadius: "5px",
+        backgroundColor: "#c2b3a6",
     },
     s2: {
         backgroundColor: "#eee4da",

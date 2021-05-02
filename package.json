@@ -12,7 +12,8 @@
         "@parcel/babel-plugin-transform-runtime": "^2.0.0-nightly.1823",
         "parcel": "^2.0.0-nightly.649",
         "react": "^17.0.2",
-        "react-dom": "^17.0.2"
+        "react-dom": "^17.0.2",
+        "zustand": "^3.4.2"
     },
     "scripts": {
         "dev": "parcel ./app/index.html"

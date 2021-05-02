@@ -1,4 +1,5 @@
 import { Grid } from "@material-ui/core";
+import Header from "./Header";
 import Board from "./Board";
 
 const App = (props) => {
@@ -12,6 +13,7 @@ const App = (props) => {
             style={{ minHeight: "100vh" }}
         >
             <Grid item xs={12}>
+                <Header />
                 <Board />
             </Grid>
         </Grid>
