@@ -18,7 +18,7 @@ const styles = (theme) => ({
 const Board = (props) => {
     const { classes } = props;
 
-    const { board } = useStore();
+    const { board, w } = useStore();
 
     return (
         <div className={classes.container}>
@@ -31,7 +31,7 @@ const Board = (props) => {
             {board.map((row, i) => (
                 <Grid container key={i}>
                     {row.map((score, j) => (
-                        <Grid item xs={3} key={`${i}_${j}`} className={classes.case}>
+                        <Grid item xs={12 / w} key={`${i}_${j}`} className={classes.case}>
                             <Tile score={score} />
                         </Grid>
                     ))}

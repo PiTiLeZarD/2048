@@ -1,4 +1,4 @@
-import { withStyles, Button } from "@material-ui/core";
+import { withStyles, Button, Slider } from "@material-ui/core";
 import useStore from "./store";
 
 const styles = (theme) => ({
@@ -9,9 +9,33 @@ const styles = (theme) => ({
 
 const Header = (props) => {
     const { classes } = props;
-    const { reset } = useStore();
+    const { reset, w, h, setSize } = useStore();
     return (
         <div className={classes.container}>
+            Width:
+            <Slider
+                defaultValue={w}
+                valueLabelDisplay="auto"
+                step={1}
+                marks
+                min={2}
+                max={8}
+                onChange={(ev, newW) => {
+                    if (newW != w) setSize(newW, h);
+                }}
+            />
+            Height:
+            <Slider
+                defaultValue={h}
+                valueLabelDisplay="auto"
+                step={1}
+                marks
+                min={2}
+                max={8}
+                onChange={(ev, newH) => {
+                    if (newH != h) setSize(w, newH);
+                }}
+            />
             <Button variant="contained" onClick={(ev) => reset()}>
                 New Game
             </Button>
