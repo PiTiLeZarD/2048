@@ -19,6 +19,7 @@ const getEmptyTilesPositions = (board) =>
     ).filter(Boolean);
 const getRandomEmptyTile = (board) => {
     const emptyTiles = getEmptyTilesPositions(board);
+    if (!emptyTiles.length) return null;
     return emptyTiles[rand(emptyTiles.length)];
 };
 const addTile = (board) => {
@@ -31,11 +32,12 @@ const addTile = (board) => {
 const newBoard = (w, h) => addTile(addTile(emptyBoard(w, h)));
 
 const applyRowVectors = (row, vectors) => {
+    const newRow = [...row];
     vectors.map(([from, to]) => {
-        row[to] = (row[from] || 0) + (row[to] || 0);
-        row[from] = undefined;
+        newRow[to] = (newRow[from] || 0) + (newRow[to] || 0);
+        newRow[from] = undefined;
     });
-    return row;
+    return newRow;
 };
 const rowVectors = (row) => {
     let vectors = [];
@@ -54,6 +56,7 @@ const rowVectors = (row) => {
     }
     return vectors;
 };
+
 const boardVectors = (board) => board.map((row, y) => rowVectors(row));
 const applyBoardVectors = (board, vectors) => board.map((row, y) => applyRowVectors(row, vectors[y]));
 
