@@ -2,9 +2,9 @@ import { withStyles } from "@material-ui/core";
 
 const styles = (theme) => ({
     tile: {
-        width: "150px",
-        height: "150px",
-        lineHeight: "150px",
+        width: "100px",
+        height: "100px",
+        lineHeight: "100px",
         fontSize: "50px",
         color: "#f9f6f2",
         textAlign: "center",
