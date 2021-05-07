@@ -5,31 +5,32 @@ const DEFAULT_HEIGHT = 4;
 
 const rand = (precision) => Math.floor(Math.random() * precision);
 const getRandomScore = () => (rand(100) > 75 ? 4 : 2);
+const flatten = (arrays) => [].concat.apply([], arrays);
+
 const emptyBoard = (w, h) => new Array(h).fill().map((_w, iw) => new Array(w).fill());
+const boardSize = (board) => ({ w: board[0].length, h: board.length });
 const getEmptyTilesPositions = (board) =>
-    [].concat
-        .apply(
-            [],
-            board.map((row, y) =>
-                row.map((col, x) => {
-                    return col == undefined ? { x, y } : null;
-                })
-            )
+    flatten(
+        board.map((row, y) =>
+            row.map((col, x) => {
+                return col == undefined ? { x, y } : null;
+            })
         )
-        .filter(Boolean);
+    ).filter(Boolean);
 const getRandomEmptyTile = (board) => {
     const emptyTiles = getEmptyTilesPositions(board);
     return emptyTiles[rand(emptyTiles.length)];
 };
-const addTiles = (board) => {
-    new Array(2).fill().map((_, i) => {
-        const { x, y } = getRandomEmptyTile(board);
-        board[y][x] = getRandomScore();
-    });
+const addTile = (board) => {
+    const position = getRandomEmptyTile(board);
+    if (position) {
+        (({ x, y }) => (board[y][x] = getRandomScore()))(position);
+    }
     return board;
 };
+const newBoard = (w, h) => addTile(addTile(emptyBoard(w, h)));
 
-const applyVectors = (row, vectors) => {
+const applyRowVectors = (row, vectors) => {
     vectors.map(([from, to]) => {
         row[to] = (row[from] || 0) + (row[to] || 0);
         row[from] = undefined;
@@ -49,12 +50,13 @@ const rowVectors = (row) => {
         vectors = [...vectors, [i, pointer]];
         if (updatedRow[pointer] != undefined) pointer += 1;
 
-        updatedRow = applyVectors([...row], vectors);
+        updatedRow = applyRowVectors([...row], vectors);
     }
     return vectors;
 };
+const boardVectors = (board) => board.map((row, y) => rowVectors(row));
+const applyBoardVectors = (board, vectors) => board.map((row, y) => applyRowVectors(row, vectors[y]));
 
-const boardSize = (board) => ({ w: board[0].length, h: board.length });
 const transpose = (board) => {
     const { w, h } = boardSize(board);
     const newBoard = emptyBoard(h, w);
@@ -67,28 +69,25 @@ const transpose = (board) => {
 
     return newBoard;
 };
+const flipBoard = (board) =>
+    board.map((row, y) => {
+        row.reverse();
+        return row;
+    });
 
-const moveBoard = (board, direction, w, h) => {
-    if (direction == "left") return board.map((row) => applyVectors(row, rowVectors(row)));
-    if (direction == "right")
-        return board.map((row) => {
-            let reversed = [...row];
-            reversed.reverse();
-            reversed = applyVectors(reversed, rowVectors(reversed));
-            reversed.reverse();
-            return reversed;
-        });
-
+const moveBoard = (board, direction) => {
+    if (direction == "left") return applyBoardVectors(board, boardVectors(board));
+    if (direction == "right") return flipBoard(moveBoard(flipBoard(board), "left"));
     return transpose(moveBoard(transpose(board), { down: "right", up: "left" }[direction]));
 };
 
 const useStore = create((set) => ({
     w: DEFAULT_WIDTH,
     h: DEFAULT_HEIGHT,
-    board: addTiles(emptyBoard(DEFAULT_WIDTH, DEFAULT_HEIGHT)),
-    setSize: (w, h) => set((state) => ({ w, h, board: addTiles(emptyBoard(w, h)) })),
+    board: newBoard(DEFAULT_WIDTH, DEFAULT_HEIGHT),
+    setSize: (w, h) => set((state) => ({ w, h, board: newBoard(w, h) })),
     reset: () => set(({ w, h, setSize }) => setSize(w, h)),
-    move: (direction) => set(({ board }) => ({ board: addTiles(moveBoard(board, direction)) })),
+    move: (direction) => set(({ board }) => ({ board: addTile(moveBoard(board, direction)) })),
 }));
 
 export default useStore;
