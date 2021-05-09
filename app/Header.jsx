@@ -9,7 +9,7 @@ const styles = (theme) => ({
 
 const Header = (props) => {
     const { classes } = props;
-    const { move, reset, w, h, setSize } = useStore();
+    const { reset, w, h, setSize, score } = useStore();
     return (
         <div className={classes.container}>
             Width:
@@ -39,18 +39,7 @@ const Header = (props) => {
             <Button variant="contained" onClick={(ev) => reset()}>
                 New Game
             </Button>
-            <Button variant="contained" onClick={(ev) => move("left")}>
-                Left
-            </Button>
-            <Button variant="contained" onClick={(ev) => move("right")}>
-                Right
-            </Button>
-            <Button variant="contained" onClick={(ev) => move("up")}>
-                Up
-            </Button>
-            <Button variant="contained" onClick={(ev) => move("down")}>
-                Down
-            </Button>
+            Score {score}
         </div>
     );
 };

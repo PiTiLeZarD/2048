@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { withStyles, Grid } from "@material-ui/core";
 import Tile from "./Tile";
 import useStore from "./store";
@@ -18,7 +19,22 @@ const styles = (theme) => ({
 const Board = (props) => {
     const { classes } = props;
 
-    const { board, w } = useStore();
+    const { board, w, move } = useStore();
+
+    useEffect(() => {
+        const mappings = {
+            w: (ev) => move("up"),
+            a: (ev) => move("left"),
+            s: (ev) => move("down"),
+            d: (ev) => move("right"),
+            ArrowUp: (ev) => move("up"),
+            ArrowLeft: (ev) => move("left"),
+            ArrowDown: (ev) => move("down"),
+            ArrowRight: (ev) => move("right"),
+        };
+
+        document.addEventListener("keydown", (ev) => (mappings[ev.key] || ((ev) => {}))(ev));
+    }, []);
 
     return (
         <div className={classes.container}>

@@ -33,11 +33,13 @@ const newBoard = (w, h) => addTile(addTile(emptyBoard(w, h)));
 
 const applyRowVectors = (row, vectors) => {
     const newRow = [...row];
+    let scoreIncrease = 0;
     vectors.map(([from, to]) => {
         newRow[to] = (newRow[from] || 0) + (newRow[to] || 0);
+        scoreIncrease += newRow[to] - newRow[from];
         newRow[from] = undefined;
     });
-    return newRow;
+    return [newRow, scoreIncrease];
 };
 const rowVectors = (row) => {
     let vectors = [];
@@ -52,13 +54,15 @@ const rowVectors = (row) => {
         vectors = [...vectors, [i, pointer]];
         if (updatedRow[pointer] != undefined) pointer += 1;
 
-        updatedRow = applyRowVectors([...row], vectors);
+        [updatedRow, _] = applyRowVectors([...row], vectors);
     }
     return vectors;
 };
 
 const boardVectors = (board) => board.map((row, y) => rowVectors(row));
-const applyBoardVectors = (board, vectors) => board.map((row, y) => applyRowVectors(row, vectors[y]));
+const applyBoardVectors = (board, vectors) => board.map((row, y) => applyRowVectors(row, vectors[y])[0]);
+const getScoreIncrease = (board, vectors) =>
+    board.reduce((score, row, i) => score + applyRowVectors(row, vectors[i])[1], 0);
 
 const transpose = (board) => {
     const { w, h } = boardSize(board);
@@ -79,18 +83,39 @@ const flipBoard = (board) =>
     });
 
 const moveBoard = (board, direction) => {
-    if (direction == "left") return applyBoardVectors(board, boardVectors(board));
-    if (direction == "right") return flipBoard(moveBoard(flipBoard(board), "left"));
-    return transpose(moveBoard(transpose(board), { down: "right", up: "left" }[direction]));
+    if (direction == "left") {
+        const vectors = boardVectors(board);
+        const scoreIncrease = getScoreIncrease(board, vectors);
+        return [applyBoardVectors(board, vectors), scoreIncrease];
+    }
+    if (direction == "right") {
+        return (([board, scoreIncrease]) => [flipBoard(board), scoreIncrease])(moveBoard(flipBoard(board), "left"));
+    }
+
+    return (([board, scoreIncrease]) => [transpose(board), scoreIncrease])(
+        moveBoard(transpose(board), { down: "right", up: "left" }[direction])
+    );
 };
 
 const useStore = create((set) => ({
     w: DEFAULT_WIDTH,
     h: DEFAULT_HEIGHT,
     board: newBoard(DEFAULT_WIDTH, DEFAULT_HEIGHT),
-    setSize: (w, h) => set((state) => ({ w, h, board: newBoard(w, h) })),
-    reset: () => set(({ w, h, setSize }) => setSize(w, h)),
-    move: (direction) => set(({ board }) => ({ board: addTile(moveBoard(board, direction)) })),
+    score: 0,
+    setSize: (w, h) => set(() => ({ w, h, board: newBoard(w, h) })),
+    addScore: (scoreIncrease) => set(({ score }) => ({ score: score + scoreIncrease })),
+    reset: () =>
+        set(({ w, h, setSize }) => {
+            setSize(w, h);
+            return { score: 0 };
+        }),
+    move: (direction) =>
+        set(({ board, addScore }) => ({
+            board: (([board, scoreIncrease]) => {
+                addScore(scoreIncrease);
+                return addTile(board);
+            })(moveBoard(board, direction)),
+        })),
 }));
 
 export default useStore;
