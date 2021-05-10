@@ -4,7 +4,7 @@ const DEFAULT_WIDTH = 4;
 const DEFAULT_HEIGHT = 4;
 
 const rand = (precision) => Math.floor(Math.random() * precision);
-const getRandomScore = () => (rand(100) > 75 ? 4 : 2);
+const getRandomScore = () => (rand(100) > 90 ? 4 : 2);
 const flatten = (arrays) => [].concat.apply([], arrays);
 
 const emptyBoard = (w, h) => new Array(h).fill().map((_w, iw) => new Array(w).fill());
