@@ -60,9 +60,15 @@ const rowVectors = (row) => {
 };
 
 const boardVectors = (board) => board.map((row, y) => rowVectors(row));
-const applyBoardVectors = (board, vectors) => board.map((row, y) => applyRowVectors(row, vectors[y])[0]);
-const getScoreIncrease = (board, vectors) =>
-    board.reduce((score, row, i) => score + applyRowVectors(row, vectors[i])[1], 0);
+const applyBoardVectors = (board, vectors) => {
+    let scoreIncrease = 0;
+    const newBoard = board.map((row, y) => {
+        const [newRow, score] = applyRowVectors(row, vectors[y]);
+        scoreIncrease += score;
+        return newRow;
+    });
+    return [newBoard, scoreIncrease];
+};
 
 const transpose = (board) => {
     const { w, h } = boardSize(board);
@@ -89,8 +95,8 @@ const applyTransform = (action, board, direction, transform) =>
 const moveBoard = (board, direction) => {
     if (direction == "left") {
         const vectors = boardVectors(board);
-        const scoreIncrease = getScoreIncrease(board, vectors);
-        return [applyBoardVectors(board, vectors), vectors, scoreIncrease];
+        const [rboard, scoreIncrease] = applyBoardVectors(board, vectors);
+        return [rboard, vectors, scoreIncrease];
     }
     if (direction == "right") return applyTransform(moveBoard, board, "left", flipBoard);
 
