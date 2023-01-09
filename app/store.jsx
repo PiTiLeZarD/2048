@@ -15,12 +15,12 @@ const fillBoard = (board) => {
 };
 const emptyBoard = (w, h) => fillBoard(boardTiles(w, h));
 
-const useStore = create((set) => ({
+const useStore = create((set, get) => ({
     w: DEFAULT_WIDTH,
     h: DEFAULT_HEIGHT,
     board: emptyBoard(DEFAULT_WIDTH, DEFAULT_HEIGHT),
-    setSize: (w, h) => set((state) => ({ w, h, board: emptyBoard(w, h) })),
-    reset: () => set(({ w, h, setSize }) => setSize(w, h)),
+    setSize: (w, h) => set(() => ({ w, h, board: emptyBoard(w, h) })),
+    reset: () => get().setSize(get().w, get().h),
 }));
 
 export default useStore;
