@@ -103,7 +103,7 @@ const moveBoard = (board, direction) => {
     return applyTransform(moveBoard, board, { down: "right", up: "left" }[direction], transpose);
 };
 
-const useStore = create((set) => ({
+const useStore = create((set, get) => ({
     w: DEFAULT_WIDTH,
     h: DEFAULT_HEIGHT,
     board: newBoard(DEFAULT_WIDTH, DEFAULT_HEIGHT),
